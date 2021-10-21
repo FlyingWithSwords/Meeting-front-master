@@ -1,0 +1,20 @@
+{
+  "name": "uniapp",
+  "version": "1.0.0",
+  "description": "-\t组件使用easycom模式 cl-*(可在pages里面修改)",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"build:dev": "cross-env NODE_ENV=development UNI_PLATFORM=h5 UNI_OUTPUT_DIR=dist/build/h5 vue-cli-service uni-build",
+	"build": "atool-build",
+	"lint": "eslint --ext .js,.jsx src/",
+	"start": "dora --plugins webpack --port=8082"
+	},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "uni-read-pages": "^1.0.5",
+    "uni-simple-router": "^1.5.5"
+  }
+}

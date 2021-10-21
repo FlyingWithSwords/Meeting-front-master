@@ -1,0 +1,148 @@
+{
+	"easycom": {
+		// uview 组件
+		"^u-(.*)": "@/uview-ui/components/u-$1/u-$1.vue",
+		// 自定义组件
+		"^cl-(.*)": "@/components/cl-$1/index.vue"
+	},
+
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"name": "index",
+			"aliasPath": "/",
+			"meta": {
+				"title": "首页"
+			},
+			"style": {
+				"navigationStyle": "custom"
+			}
+		}, 
+		{
+			"path": "pages/meetingRoom/roomList",
+			"name": "roomList_test",
+			"aliasPath": "/roomList_test",
+			"meta": {
+				"title": "会议室列表"
+			},
+			"style": {
+				"navigationBarTitleText": "会议室列表",
+				"enablePullDownRefresh": false
+			}
+		}, {
+			"path": "pages/meetingRoom/hourList",
+			"name": "hourList",
+			"aliasPath": "/meetingRoom/hourList/:roomId",
+			"meta": {
+				"title": "会议室可用时间"
+			},
+			"style": {
+				"navigationBarTitleText": "会议室预定",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "pages/adminPages/addRoom/addRoom",
+			"name": "addRoom",
+			"aliasPath": "/addRoom",
+			"meta": {
+				"title": "增加会议室"
+			},
+			"style": {
+				"navigationBarTitleText": "增加会议室",
+				"enablePullDownRefresh": false
+			}
+		}, 
+		{
+			"path": "pages/adminPages/updRoom/updRoom",
+			"name": "updRoom",
+			"aliasPath": "/updRoom",
+			"meta": {
+				"title": "修改会议室"
+			},
+			"style": {
+				"navigationBarTitleText": "修改会议室",
+				"enablePullDownRefresh": false
+			}
+		}, 
+		{
+			"path": "pages/userPages/bookMeet/bookMeet",
+			"name": "bookMeet",
+			"aliasPath": "/bookMeet",
+			"meta": {
+				"title": "预订会议室"
+			},
+			"style": {
+				"navigationBarTitleText": "预订会议室",
+				"enablePullDownRefresh": false
+			}
+		}
+		, {
+			"path": "pages/adminPages/roomList/roomList",
+			"name": "roomList",
+			"aliasPath": "/roomList",
+			"meta": {
+				"title": "会议室列表"
+			},
+			"style": {
+				"navigationBarTitleText": "会议室列表",
+				"enablePullDownRefresh": false
+			}
+		},{
+		    "path": "pages/adminPages/roomDetail/roomDetail",
+		    "name": "roomDetail",
+		    "aliasPath": "/roomDetail",
+		    "meta": {
+		    	"title": "会议室详情"
+		    },
+		    "style": {
+		    	"navigationBarTitleText": "会议室详情",
+		    	"enablePullDownRefresh": false
+		    }
+		},
+		{
+			"path": "pages/adminPages/meetList/meetList",
+			"name": "meetList",
+			"aliasPath": "/meetList",
+			"meta": {
+				"title": "会议列表"
+			},
+			"style": {
+				"navigationBarTitleText": "会议列表",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "pages/adminPages/nameplateSet/nameplateSet",
+			"name": "nameplateSet",
+			"aliasPath": "/nameplateSet",
+			"meta": {
+				"title": "设置铭牌"
+			},
+			"style": {
+				"navigationBarTitleText": "设置铭牌",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			// query 方式传参
+			"path": "pages/public/richPage/richPage",
+			// params 传参
+			"name": "richPage",
+			"meta": {
+				"title": "富文本页"
+			},
+			"style": {
+				"navigationBarTitleText": "富文本页",
+				"enablePullDownRefresh": false
+			}
+
+		}
+    ],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	}
+}
