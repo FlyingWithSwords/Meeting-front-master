@@ -22,7 +22,7 @@
 		<view>
 			<!-- <u-tabs :list="tabList" :is-scroll="false" :current="currentTab" @change="changeTab"></u-tabs> -->
 			<u-index-list :scrollTop="scrollTop" style="clear: both;" :sticky="false" :index-list="[]">
-				<view v-for="(item, index) in roomList" :key="index" :data-index="index" @longpress="onLongPress" :class="{'active':pickerUserIndex==index}" @tap="listTap(item.id)">
+				<view v-for="(item, index) in roomList" :key="index" :data-index="index"  @mousemove="getClient" @longpress="onLongPress" @contextmenu.prevent="oncontextmenu" :class="{'active':pickerUserIndex==index}" @tap="listTap(item.id)">
 					<view class="list-cell roomList">{{item.roomName}}</view>
 				</view>
 			</u-index-list>
@@ -80,14 +80,14 @@
 					},
 				],
 				checked: false,
-				array_f: [],
-				value_f: [],
+				array_f: ["全部"],
+				value_f: ["all"],
 				array_c: [],
 				code_c: [],
 				value_c: [0, 0],
-				indexLs_c: [-1, -1],
+				indexLs_c: [0, 0],
 				index_c: -1,
-				index_f: -1,
+				index_f: 0,
 				date: currentDate,
 				currentTarbar: 0,
 				currentTab: 0,
@@ -95,6 +95,9 @@
 				roomList: [],
 				selectJson: {},
 				// allRoomList: [],
+				
+				ls_clientX: 0,
+				ls_clientY: 0,
 				
 				winSize: {},
 				/* 显示遮罩 */
@@ -153,7 +156,7 @@
 						'content-type': 'application/json' //自定义请求头信息
 					},
 					success: function(res) {
-						var objstr = "[";
+						var objstr = '[{name: \'全部\', \"city\":[{name:\"\"}]},';
 						var datalist = res.data.page.list;
 						this.code_res = datalist;
 						console.log(this.code_res);
@@ -284,7 +287,8 @@
 			        index_c: this.value_c,
 			        data: selectVal
 			    });
-				this.selectJson.city = this.code_res[this.value_c[0]].cities[this.value_c[1]].code;
+				this.selectJson.city = this.value_c[0]==0?"":this.code_res[this.value_c[0]-1].cities[this.value_c[1]].code;
+				if(this.value_c[0]==0){delete this.selectJson.city;}
 				uni.request({
 				    url: this.url_pre+'room/list',
 				    data: this.selectJson,   // 这里传入你的参数(json格式)
@@ -318,6 +322,7 @@
 			bindPickerFloor: function(e) {
 				this.index_f = e.target.value;
 				this.selectJson.floor = this.value_f[this.index_f];
+				if(this.index_f==0){delete this.selectJson.floor;}
 				uni.request({
 				    url: this.url_pre+'room/list',
 				    data: this.selectJson,   // 这里传入你的参数(json格式)
@@ -388,6 +393,11 @@
 						console.log('登录失败：', err);
 					},
 					complete: (com) => {
+						uni.showToast({
+							title: com.data.msg,
+							icon: 'none',
+							duration: 3000
+						});
 						console.log('请求登录结束：', com);
 					}
 				});
@@ -401,8 +411,7 @@
 				let hour = date.getHours();
 				let min = (date.getMinutes()<10?"0":"")+date.getMinutes();
 				return hour+':'+min;
-			}
-			,
+			},
 			getDate(type,value) {
 				const date = (value=="")?new Date():new Date(value);
 				let year = date.getFullYear();
@@ -440,11 +449,39 @@
 				uni.getSystemInfo({
 					success: (res) => {
 						this.winSize = {
+							"res": res,
 							"witdh": res.windowWidth,
 							"height": res.windowHeight
 						}
 					}
 				})
+			},
+			getClient(e) {
+				this.ls_clientX=e.clientX;
+				this.ls_clientY=e.clientY;
+			},
+			oncontextmenu(e) {
+				var style="";
+				
+				if (this.ls_clientY > (this.winSize.height / 2)) {
+					style = `bottom:${this.winSize.height-this.ls_clientY}px;`;
+				} else {
+					style = `top:${this.ls_clientY+44}px;`;
+				}
+				if (this.ls_clientX > (this.winSize.witdh / 2)) {
+					style += `right:${this.winSize.witdh-this.ls_clientX}px`;
+				} else {
+					style += `left:${this.ls_clientX}px`;
+				}
+				
+				this.popStyle = style;
+				this.pickerUserIndex = Number(e.currentTarget.dataset.index);
+				this.showShade = true;
+				this.$nextTick(() => {
+					setTimeout(() => {
+						this.showPop = true;
+					}, 10);
+				});
 			},
 			/* 长按监听 */
 			onLongPress(e) {
@@ -454,7 +491,7 @@
 				if (touches.clientY > (this.winSize.height / 2)) {
 					style = `bottom:${this.winSize.height-touches.clientY}px;`;
 				} else {
-					style = `top:${touches.clientY}px;`;
+					style = `top:${touches.clientY+44}px;`;
 				}
 				if (touches.clientX > (this.winSize.witdh / 2)) {
 					style += `right:${this.winSize.witdh-touches.clientX}px`;

@@ -51,9 +51,8 @@
 				<view class="uni-form-item">
 					<view class="uni-title uni-common-pl">参与人</view>
 					<view class="uni-list-cell-db text-edited">
-						<picker @change="bindPickerChange3" :value="index3" :range="array2">
-							<view v-if="index3==-1" class="uni-input" style="color: #888;">请选择></view>
-							<view v-else class="uni-input">{{array2[index3]}}</view>
+							<view class="uni-input" style="height:40px;word-break:break-all;overflow: auto;" @tap="sel_show = true">{{sel_value || "请选择"}}</view>
+							<multiple-select v-model="sel_show" :data="array2" :default-selected="defaultSelected" @confirm="mulsel_confirm"></multiple-select>
 							<view hidden="true"><input type="hidden" name="member" :value="array2[index3]" /></view>
 						</picker>
 					</view>
@@ -69,6 +68,7 @@
 
 <script>
 	import urlConfig from "../../../common/config.js";
+	import multipleSelect from "@/components/momo-multipleSelect/momo-multipleSelect.vue";
 	export default {
 		data() {
 			const currentDate = this.getDate({
@@ -80,10 +80,11 @@
 			const currentTime = this.getTime();
 			return {
 				url_pre: urlConfig.baseUrl,
+				id: "",
 				title: 'picker',
 				roomList: [],
 				roomId: [],
-				array2: ['1', '2', '3', '4'],
+				array2: [{'label':'1', 'value':'1'}, {'label':'2', 'value':'2'}, {'label':'3','value':'3'}, {'label':'4','value':'4'}, {'label':'5','value':'5'}],
 				array_t: ['1小时', '2小时', '3小时', '4小时', '5小时', '6小时', '7小时',
 				 '8小时', '9小时', '10小时', '11小时', '12小时'],
 				index_t: 0,
@@ -91,8 +92,14 @@
 				index3: -1,
 				date: currentDate,
 				date_v: currentDate_v,
-				time: currentTime
+				time: currentTime,
+				sel_show: false,
+				sel_value: "",
+				defaultSelected: [],
 			}
+		},
+		components: {
+			multipleSelect
 		},
 		computed: {
 			startDate() {
@@ -201,10 +208,17 @@
 				if(flag==true){
 					return `${word}${year}${month}月${day}日`;}
 				else{
-					return `${year}/${month}/${day}`;
+					return `${year}-${month}-${day}`;
 				}
 			},
+			mulsel_confirm(data) {
+				console.log(data);
+				this.sel_value = data.map((el) => el.label).join(", ");
+				this.defaultSelected = this.sel_value.split(", ");
+				console.log(this.defaultSelected);
+			},
 			onLoad(options){
+				this.id=options.id;
 				uni.request({
 						url: this.url_pre+'/room/list', //接口地址。
 						// data: {city: '广州', floor: '1', bookDate: '2021-09-22 14:15:13'},
@@ -217,6 +231,9 @@
 							for(var i=0;i<datalist.length;i++){
 								this.roomId.push(datalist[i].roomEntity.id);
 								this.roomList.push(datalist[i].roomEntity.name);
+								if(this.id==datalist[i].roomEntity.id){
+									this.index_r=i;
+								}
 							}
 							console.log(res.data);
 							console.log('request success');

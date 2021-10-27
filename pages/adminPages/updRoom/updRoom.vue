@@ -19,9 +19,9 @@
 			<view class="divide-line"></view>
 			<view class="uni-list">
 				<view class="uni-form-item">
-					<view class="uni-title uni-common-pl">会议室名<font style="color: #ff0000;margin-left: 3px;">*</font>
-					</view>
-					<input class="uni-input text-edited" name="name" placeholder="请输入" :value="item.name" />
+					<view class="uni-title uni-common-pl">会议室名</view>
+					<view class="uni-input text-edited" name="name">{{item.name}}</view>
+					<view hidden="true"><input type="hidden" name="name" :value="item.name" /></view>
 				</view>
 			</view>
 
@@ -115,7 +115,7 @@
 					</view>
 				</view>
 
-				<view class="uni-list-cell">
+				<!-- <view class="uni-list-cell">
 					<view class="uni-form-item">
 						<view class="uni-title uni-common-pl">基站</view>
 						<view class="uni-list-cell-db text-edited">
@@ -126,7 +126,7 @@
 							</picker>
 						</view>
 					</view>
-				</view>
+				</view> -->
 
 				<view class="uni-list-cell">
 					<view class="uni-form-item">
@@ -154,7 +154,9 @@
 				<view class="uni-list-cell">
 					<view class="uni-form-item">
 						<view class="uni-title uni-common-pl" style="margin-right: 45px;">实景照片</view>
-						<u-upload name="picture" ref="upload" :action="pic_url" @on-uploaded="onUploaded"></u-upload>
+						<u-image :src="item.picUrl" style="margin-top: 10rpx;" width="200rpx" height="200rpx" border-radius="0.5em"></u-image>
+						<u-upload name="file" ref="upload" :header="u_header" :action="pic_url" @on-uploaded="onUploaded"></u-upload>
+						<view hidden="true"><input type="hidden" name="picUrl" :value="picUrl" /></view>
 					</view>
 				</view>
 			</view>
@@ -259,7 +261,10 @@
 				sel_show: false,
 				sel_value: "",
 				defaultSelected: [],
-				selected: []
+				selected: [],
+				u_header: {'content-type': 'multipart/form-data'},
+				fileList: [{}],
+				picUrl: ""
 			}
 		},
 		created() {
@@ -293,7 +298,6 @@
 					content: '表单数据内容：' + JSON.stringify(formdata),
 					showCancel: false
 				});
-				this.$refs.upload.upload();
 				uni.request({
 				    url: this.url_pre+'/room/update', //接口地址。
 					method: 'POST',
@@ -308,6 +312,9 @@
 						uni.showModal({
 							content: this.massage,
 							showCancel: false
+						});
+						uni.navigateTo({
+							url: "/roomList"
 						});
 				    },
 					fail: (res) => {
@@ -325,6 +332,12 @@
 				console.log('清空数据');
 			},
 			onUploaded(lists){
+				uni.showToast({
+					title: "图片上传完成",
+					icon: 'success',
+					duration: 3000
+				});
+				this.picUrl=lists[0].url;
 				console.log(lists);
 			},
 			bindPickerChange_floor: function(e) {
@@ -521,6 +534,10 @@
 						this.item=res.data.room.roomEntity;
 						this.item_kw=res.data.room.roomEntity.device;
 						this.item_kw=this.item_kw.substr(1,this.item_kw.length-2);
+						this.time1=this.item.validBeginHour;
+						this.time2=this.item.validEndHour;
+						this.fileList[0].url=this.item.picUrl;
+						console.log(this.fileList);
 						this.selected=res.data.room.eslIds;
 						var eslIdstr="";
 						for(var i=0;i<this.selected.length;i++){

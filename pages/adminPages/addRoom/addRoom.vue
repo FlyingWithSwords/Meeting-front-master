@@ -154,7 +154,8 @@
 				<view class="uni-list-cell">
 					<view class="uni-form-item">
 						<view class="uni-title uni-common-pl" style="margin-right: 45px;">实景照片</view>
-						<u-upload name="picture" ref="upload" :action="pic_url" @on-uploaded="onUploaded"></u-upload>
+						<u-upload name="file" ref="upload" :header="u_header" :action="pic_url" @on-uploaded="onUploaded"></u-upload>
+						<view hidden="true"><input type="hidden" name="picUrl" :value="picUrl" /></view>
 					</view>
 				</view>
 			</view>
@@ -254,6 +255,8 @@
 				sel_show: false,
 				sel_value: "",
 				defaultSelected: [],
+				u_header: {'content-type': 'application/json'},
+				picUrl: ""
 			}
 		},
 		created() {
@@ -287,7 +290,6 @@
 					content: '表单数据内容：' + JSON.stringify(formdata),
 					showCancel: false
 				});
-				this.$refs.upload.upload();
 				uni.request({
 				    url: this.url_pre+'/room/save', //接口地址。
 					method: 'POST',
@@ -302,6 +304,9 @@
 						uni.showModal({
 							content: this.massage,
 							showCancel: false
+						});
+						uni.navigateTo({
+							url: "/roomList"
 						});
 				    },
 					fail: (res) => {
@@ -319,6 +324,12 @@
 				console.log('清空数据');
 			},
 			onUploaded(lists){
+				uni.showToast({
+					title: "图片上传完成",
+					icon: 'success',
+					duration: 3000
+				});
+				this.picUrl=lists[0].url;
 				console.log(lists);
 			},
 			bindPickerChange_floor: function(e) {

@@ -35,7 +35,7 @@
 		<view class="divide-line"></view>
 		
 		<view class="uni-list">
-			<view class="uni-list-cell">
+			<!-- <view class="uni-list-cell">
 				<view class="uni-form-item">
 					<view class="uni-title uni-common-pl">创建时间</view>
 					<view class="uni-input text-edited">{{item.createTime}}</view>
@@ -47,12 +47,19 @@
 					<view class="uni-title uni-common-pl">更新时间</view>
 					<view class="uni-input text-edited">{{item.updateTime}}</view>
 				</view>
-			</view>
+			</view> -->
 			
 			<view class="uni-list-cell">
 				<view class="uni-form-item">
 					<view class="uni-title uni-common-pl">状态</view>
-					<view class="uni-input text-edited">{{item.state=='applied'?'已申请':item.state=='signed'?'已签到':item.state=='started'?'已开始':item.state=='over'?'已结束':item.state=='canceled'?'已取消':'未知'}}</view>
+					<view class="uni-input text-edited">{{item.state}}</view>
+				</view>
+			</view>
+		
+			<view class="uni-list-cell">
+				<view class="uni-form-item">
+					<view class="uni-title uni-common-pl">可选时段</view>
+					<view class="uni-input text-edited">{{item.validBeginHour}}~{{item.validEndHour}}</view>
 				</view>
 			</view>
 		
@@ -74,12 +81,12 @@
 				</view>
 			</view>
 		
-			<view class="uni-list-cell">
+			<!-- <view class="uni-list-cell">
 				<view class="uni-form-item">
 					<view class="uni-title uni-common-pl">基站</view>
 					<view class="uni-input text-edited">{{item.apMac}}</view>
 				</view>
-			</view>
+			</view> -->
 		
 			<view class="uni-list-cell">
 				<view class="uni-form-item">
@@ -93,6 +100,17 @@
 					<view class="uni-title uni-common-pl">桌面铭牌</view>
 					<view class="uni-input text-edited" style="height:40px;word-break:break-all;overflow: auto;">{{eslIds}}</view>
 				</view>
+			</view>
+			
+			<view class="uni-list-cell">
+				<view class="uni-form-item">
+					<view class="uni-title uni-common-pl" style="margin-right: 45px;">实景照片</view>
+					<u-image :src="item.picUrl" width="200rpx" height="200rpx" border-radius="0.5em"></u-image>
+				</view>
+			</view>
+			
+			<view class="uni-padding-wrap uni-common-mt">
+				<button type="primary" @tap="bookSubmit">预约</button>
 			</view>
 		</view>
 	</view>
@@ -111,6 +129,7 @@
 				rec_kw: [],
 				city: '',
 				doorEslId: '',
+				fileList: [{}]
 			}
 		},
 		methods: {
@@ -162,6 +181,11 @@
 						console.log(res.data);
 						console.log('request failure');
 					}
+				});
+			},
+			bookSubmit: function(){
+				uni.navigateTo({
+					url: "/bookMeet?id="+this.id
 				});
 			}
 		}
