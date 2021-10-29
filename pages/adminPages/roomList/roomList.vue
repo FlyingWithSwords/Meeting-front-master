@@ -393,11 +393,13 @@
 						console.log('登录失败：', err);
 					},
 					complete: (com) => {
-						uni.showToast({
-							title: com.data.msg,
-							icon: 'none',
-							duration: 3000
-						});
+						if(com.data.msg!="success"){
+							uni.showToast({
+								title: com.data.msg,
+								icon: 'none',
+								duration: 3000
+							});
+						}
 						console.log('请求登录结束：', com);
 					}
 				});

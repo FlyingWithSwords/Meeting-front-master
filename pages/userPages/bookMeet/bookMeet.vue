@@ -53,7 +53,7 @@
 					<view class="uni-list-cell-db text-edited">
 							<view class="uni-input" style="height:40px;word-break:break-all;overflow: auto;" @tap="sel_show = true">{{sel_value || "请选择"}}</view>
 							<multiple-select v-model="sel_show" :data="array2" :default-selected="defaultSelected" @confirm="mulsel_confirm"></multiple-select>
-							<view hidden="true"><input type="hidden" name="member" :value="array2[index3]" /></view>
+							<view hidden="true"><input type="hidden" name="member" :value="defaultSelected.toString()" /></view>
 						</picker>
 					</view>
 				</view>
@@ -113,9 +113,34 @@
 			formSubmit: function(e) {
 				console.log('form发生了submit事件，携带数据为：' + JSON.stringify(e.detail.value))
 				var formdata = e.detail.value;
-				if(JSON.stringify(formdata).indexOf("\"\"")!=-1){
+				var form_title = "";
+				var form_flag = 0;
+				var first_Ftitle = "";
+				for(var ele in formdata){
+					if(formdata[ele].length==0){
+						if(form_flag==1 && form_title.length!=0){
+							first_Ftitle = form_title;
+						}
+						switch(ele) {
+							case 'content': form_title="填写日程/会议/活动主题";break;
+							case 'startTime': form_title="选择开始时间";break;
+							case 'duration': form_title="选择时长";break;
+							case 'roomId': form_title="选择会议室";break;
+							case 'member': form_title="选择参与人";break;
+							default:continue;
+						}
+						if(form_flag>=1 && first_Ftitle.length!=0){
+							form_title=first_Ftitle;
+						}
+						form_flag++;
+					}
+				}
+				if(form_flag==5){
+					form_title="补充所有内容";
+				}
+				if(form_title!=""){
 					uni.showModal({
-						content: "不能提交空信息",
+						content: "请"+form_title,
 						showCancel: false
 					});
 					return;

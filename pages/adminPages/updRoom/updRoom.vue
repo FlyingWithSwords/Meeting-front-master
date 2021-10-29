@@ -154,8 +154,7 @@
 				<view class="uni-list-cell">
 					<view class="uni-form-item">
 						<view class="uni-title uni-common-pl" style="margin-right: 45px;">实景照片</view>
-						<u-image :src="item.picUrl" style="margin-top: 10rpx;" width="200rpx" height="200rpx" border-radius="0.5em"></u-image>
-						<u-upload name="file" ref="upload" :header="u_header" :action="pic_url" @on-uploaded="onUploaded"></u-upload>
+						<u-upload name="file" ref="upload" max-count="1" :fileList="fileList" :header="u_header" :action="pic_url" @on-uploaded="onUploaded"></u-upload>
 						<view hidden="true"><input type="hidden" name="picUrl" :value="picUrl" /></view>
 					</view>
 				</view>
@@ -263,7 +262,7 @@
 				defaultSelected: [],
 				selected: [],
 				u_header: {'content-type': 'multipart/form-data'},
-				fileList: [{}],
+				fileList: [],
 				picUrl: ""
 			}
 		},
@@ -287,17 +286,50 @@
 				e.detail.value.namePlateEslIds=this.defaultSelected;
 				console.log('form发生了submit事件，携带数据为：' + JSON.stringify(e.detail.value));
 				var formdata = e.detail.value;
-				if(JSON.stringify(formdata).indexOf("\"\"")!=-1){
+				var form_title = "";
+				var form_flag = 0;
+				var first_Ftitle = "";
+				for(var ele in formdata){
+					if(formdata[ele].length==0){
+						if(form_flag==1 && form_title.length!=0){
+							first_Ftitle = form_title;
+						}
+						switch(ele) {
+							case 'name': form_title="填写会议室名";break;
+							case 'province': form_title="选择城市";break;
+							case 'city': form_title="选择城市";break;
+							case 'floor': form_title="选择办公楼";break;
+							case 'type': form_title="选择会议室类型";break;
+							case 'validBeginHour': form_title="选择可选时段";break;
+							case 'validEndHour': form_title="选择可选时段";break;
+							case 'capcity': form_title="填写容纳人数";break;
+							// case 'device': form_title="设备工具";break;
+							case 'apMac': form_title="选择基站";break;
+							case 'doorEslId': form_title="选择电子会议门牌";break;
+							// case 'picUrl': form_title="上传实景图片";break;
+							case 'namePlateEslIds': form_title="选择桌面铭牌";break;
+							default:continue;
+						}
+						if(form_flag>=1 && first_Ftitle.length!=0){
+							form_title=first_Ftitle;
+						}
+						form_flag++;
+					}
+				}
+				if(form_flag==9){
+					form_title="补充所有内容";
+				}
+				if(form_title!=""){
 					uni.showModal({
-						content: "不能提交空信息",
+						content: "请"+form_title,
 						showCancel: false
 					});
 					return;
 				}
-				uni.showModal({
+				/* uni.showModal({
 					content: '表单数据内容：' + JSON.stringify(formdata),
 					showCancel: false
-				});
+				}); */
 				uni.request({
 				    url: this.url_pre+'/room/update', //接口地址。
 					method: 'POST',
@@ -311,10 +343,17 @@
 				        console.log('request success');
 						uni.showModal({
 							content: this.massage,
-							showCancel: false
-						});
-						uni.navigateTo({
-							url: "/roomList"
+							showCancel: false,
+							success: function (res) {
+								if (res.confirm) {
+									console.log('用户点击确定');
+									uni.navigateTo({
+										url: "/roomList"
+									});
+								} else if (res.cancel) {
+									console.log('用户点击取消');
+								}
+							}
 						});
 				    },
 					fail: (res) => {
@@ -373,10 +412,10 @@
 								if(i!=this.defaultSelected.length-1) {
 									this.sel_value += ", ";
 								}
-								if(this.sel_value.split(", ").length==1){
-									this.sel_value = this.defaultSelected[i];
-								}
 							}
+						}
+						if(this.sel_value.substr(this.sel_value.length-2)==", "){
+							this.sel_value = this.sel_value.substr(0,this.sel_value.length-2);
 						}
 						this.defaultSelected = sel_temp;
 					}
@@ -533,11 +572,11 @@
 				    success: (res) => {
 						this.item=res.data.room.roomEntity;
 						this.item_kw=res.data.room.roomEntity.device;
-						this.item_kw=this.item_kw.substr(1,this.item_kw.length-2);
+						this.item_kw=this.item_kw.length==0?"":this.item_kw.substr(1,this.item_kw.length-2);
 						this.time1=this.item.validBeginHour;
 						this.time2=this.item.validEndHour;
-						this.fileList[0].url=this.item.picUrl;
-						console.log(this.fileList);
+						this.fileList.push({url:this.item.picUrl});
+						this.picUrl=this.item.picUrl;
 						this.selected=res.data.room.eslIds;
 						var eslIdstr="";
 						for(var i=0;i<this.selected.length;i++){
@@ -553,24 +592,26 @@
 							}
 						}
 						this.sel_value=eslIdstr;
-						var devLs=this.item_kw.split(',');
-						for(var i=0;i<devLs.length;i++){
-							var split=devLs[i].split(":");
-							var array_kwstr="";
-							for(var j=0;j<split[0].length;j++){
-								if(split[0][j]!=("\'") && split[0][j]!=(" ")){
-									array_kwstr+=split[0][j];
+						if(this.item_kw.length!=0){
+							var devLs=this.item_kw.split(',');
+							for(var i=0;i<devLs.length;i++){
+								var split=devLs[i].split(":");
+								var array_kwstr="";
+								for(var j=0;j<split[0].length;j++){
+									if(split[0][j]!=("\'") && split[0][j]!=(" ")){
+										array_kwstr+=split[0][j];
+									}
 								}
-							}
-							this.array_kw.push(array_kwstr);
-							arrayKw.push(array_kwstr);
-							var rec_kwstr="";
-							for(var k=0;k<split[1].length;k++){
-								if(split[1][k]!=("\'") && split[1][k]!=(" ")){
-									rec_kwstr+=split[1][k];
+								this.array_kw.push(array_kwstr);
+								arrayKw.push(array_kwstr);
+								var rec_kwstr="";
+								for(var k=0;k<split[1].length;k++){
+									if(split[1][k]!=("\'") && split[1][k]!=(" ")){
+										rec_kwstr+=split[1][k];
+									}
 								}
+								this.rec_kw.push(rec_kwstr);
 							}
-							this.rec_kw.push(rec_kwstr);
 						}
 						
 						uni.request({
@@ -726,7 +767,12 @@
 							for(var i=0;i<datalist.length;i++){
 								this.array_es.push(datalist[i].eslId);
 								this.value_es.push(datalist[i].eslId);
-								this.array_mules.push(eval("({"+"label: '"+datalist[i].eslId+"', value: '"+datalist[i].eslId+"', disabled: true})"));
+								if(datalist[i].eslId==this.doorEslId){
+									this.array_mules.push(eval("({"+"label: '"+datalist[i].eslId+"', value: '"+datalist[i].eslId+"', disabled: true})"));
+								}
+								else{
+									this.array_mules.push(eval("({"+"label: '"+datalist[i].eslId+"', value: '"+datalist[i].eslId+"', disabled: false})"));
+								}
 							}
 							console.log(res.data);
 							console.log('request success');

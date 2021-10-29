@@ -158,7 +158,7 @@
 							}
 						}
 						this.eslIds=eslIdstr;
-						this.array_kw=eval("("+res.data.room.roomEntity.device+")");
+						this.array_kw=this.item.device.length==0?"":eval("("+this.item.device+")");
 						uni.request({
 							url: this.url_pre+'/sys/dict/info/'+this.item.province+'/'+this.item.city, //接口地址。
 							header: {
