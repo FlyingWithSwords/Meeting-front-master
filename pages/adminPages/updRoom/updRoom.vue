@@ -261,7 +261,7 @@
 				sel_value: "",
 				defaultSelected: [],
 				selected: [],
-				u_header: {'content-type': 'multipart/form-data'},
+				u_header: {'content-type': 'multipart/form-data;boundary=7f4bc4aa6d655ada3f72c9ef0ab75474'},
 				fileList: [],
 				picUrl: ""
 			}
