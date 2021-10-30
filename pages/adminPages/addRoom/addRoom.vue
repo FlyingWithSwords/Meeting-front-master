@@ -154,7 +154,7 @@
 				<view class="uni-list-cell">
 					<view class="uni-form-item">
 						<view class="uni-title uni-common-pl" style="margin-right: 45px;">实景照片</view>
-						<u-upload name="file" ref="upload" max-count="1" :header="u_header" :action="pic_url" @on-uploaded="onUploaded"></u-upload>
+						<u-upload name="file" max-count="1" :header="u_header" :action="pic_url" @on-uploaded="onUploaded"></u-upload>
 						<view hidden="true"><input type="hidden" name="picUrl" :value="picUrl" /></view>
 					</view>
 				</view>
@@ -255,7 +255,9 @@
 				sel_show: false,
 				sel_value: "",
 				defaultSelected: [],
-				u_header: {'content-type': 'multipart/form-data;boundary=7f4bc4aa6d655ada3f72c9ef0ab75474'},
+				u_header: {
+					// 'Content-Type': 'multipart/form-data;boundary=7f4bc4aa6d655ada3f72c9ef0ab75474',
+				},
 				picUrl: ""
 			}
 		},
