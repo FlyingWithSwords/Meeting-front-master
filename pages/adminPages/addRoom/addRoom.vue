@@ -375,7 +375,7 @@
 					icon: 'success',
 					duration: 3000
 				});
-				this.picUrl=lists[0].url;
+				this.picUrl=lists[0].response.url;
 				console.log(lists);
 			},
 			bindPickerChange_floor: function(e) {
