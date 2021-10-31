@@ -123,7 +123,7 @@
             }
         },
         "domain" : "159.75.242.167",
-        "sdkConfigs" : {
+		"sdkConfigs" : {
             "maps" : {}
         }
     }
