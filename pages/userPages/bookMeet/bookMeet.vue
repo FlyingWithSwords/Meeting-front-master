@@ -16,7 +16,7 @@
 					<view class="uni-list-cell-last text-edited">
 						<picker mode="time" :value="time" @change="bindTimeChange">
 							<view class="time-text" style="margin-right: 12px;">{{time}}</view>
-							<view hidden="true"><input type="hidden" name="startTime" :value="date_v+' '+time" /></view>
+							<view hidden="true"><input type="hidden" name="startTime" :value="date_v+' '+time+':00'" /></view>
 						</picker>
 					</view>
 				</view>
