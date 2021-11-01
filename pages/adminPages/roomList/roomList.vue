@@ -547,10 +547,12 @@
 						url: "/updRoom?id="+this.roomList[this.pickerUserIndex].id
 					})
 				}
+				var ids = new Array();
+				ids.push(this.roomList[this.pickerUserIndex].id);
 				if(index==2){
 					uni.request({
 					    url: this.url_pre+'/room/delete', //接口地址。
-					    data: {id: this.roomList[this.pickerUserIndex].id},
+					    data: {ids: ids},
 					    method: 'POST',
 					    header: {
 					    	'content-type': 'application/json' //自定义请求头信息
