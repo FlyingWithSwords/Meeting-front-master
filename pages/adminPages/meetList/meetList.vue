@@ -1,5 +1,5 @@
 <template>
-	<view class="content">
+	<view class="content" :key="isRouterAlive">
 		<view class="uni-input title">全部会议</view>
 		<view style="margin: 8px;">
 			<picker @change="bindPickerChange" :value="index" :range="array" class="picker-s">
@@ -20,8 +20,8 @@
 				<view class="h-td">会议状态</view>
 				<view class="h-td">开始时间</view>
 			</view>
-			<view v-for="item in meetList">
-				<view class="h-tr h-tr-3" @click="clickMeet(item)">
+			<view v-for="(item,i) in meetList">
+				<view :class="htr[i]" @click="clickMeet(item,i)">
 					<view class="h-td">{{item.subject}}</view>
 					<view class="h-td">{{item.employeeId}}</view>
 					<!-- <view class="h-td">{{item.roomId}}</view> -->
@@ -80,7 +80,9 @@
 				cliMeet: true,
 				cliFlag: 0,
 				applicationId: "",
-				roomId: ""
+				roomId: "",
+				htr: [],
+				isRouterAlive: true
 			}
 		},
 		methods: {
@@ -92,7 +94,7 @@
 			refrash: function(){
 				uni.request({
 						url: this.url_pre+'esl/refreshEsl', //接口地址。
-						data: {applicationId: this.clickId}, //暂缺接口参数
+						data: {applicationId: this.applicationId}, //暂缺接口参数
 						method: 'POST',
 						header: {
 							'content-type': 'application/json' //自定义请求头信息
@@ -138,6 +140,11 @@
 						success: (res) => {
 							console.log(res.data);
 							this.meetList = res.data.page.list;
+							this.cliMeet=true;
+							this.htr = [];
+							for(var i=0;i<this.meetList.length;i++){
+								this.htr.push("h-tr h-tr-3");
+							}
 							console.log('request success');
 						},
 						fail: (res) => {
@@ -156,10 +163,24 @@
 			// 	}
 			// 	console.log(this.cliFlag);
 			// },
-			clickMeet: function(e){
+			clickMeet: function(e,index){
 				this.cliMeet=false;
 				this.applicationId=e.id;
 				this.roomId=e.roomId;
+				
+				for(var i=0;i<this.htr.length;i++){
+					if(i==index){
+						this.htr[i]="h-tr h-trHover h-tr-3";
+					}
+					else{
+						this.htr[i]="h-tr h-tr-3";
+					}
+				}
+				
+				this.isRouterAlive = false;
+				this.$nextTick(() => {
+					this.isRouterAlive = true;
+				});
 				console.log(e);
 			},
 			formSubmit: function(e) {
@@ -174,7 +195,26 @@
 				console.log('清空数据')
 			},
 			onLoad(options){
-				
+				uni.request({
+						url: this.url_pre+'/application/list', //接口地址。
+						method: 'GET',
+						header: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+						dataType: 'json',
+						success: (res) => {
+							console.log(res.data);
+							this.meetList = res.data.page.list;
+							for(var i=0;i<this.meetList.length;i++){
+								this.htr.push("h-tr h-tr-3");
+							}
+							console.log('request success');
+						},
+						fail: (res) => {
+							console.log(res.data);
+							console.log('request failure');
+						}
+				});
 			}
 		}
 		
@@ -202,6 +242,11 @@
 	}
 	
 	.h-tr:hover {
+		-moz-transition: 0.8s; /* Firefox 4 */
+		-webkit-transition: 0.8s; /* Safari 和 Chrome */
+		-o-transition: 0.8s; /* Opera */
+	}
+	.h-trHover{
 		background: #DEDEE3;
 		transition: 0.8s;
 		-moz-transition: 0.8s; /* Firefox 4 */

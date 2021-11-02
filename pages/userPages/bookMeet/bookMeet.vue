@@ -2,7 +2,7 @@
 	<view class="content">
 		<form @submit="formSubmit" @reset="formReset">
 			<view class="uni-form-item">
-				<input class="uni-title uni-common-pl" name="content" placeholder="日程、会议、活动主题" />
+				<input class="uni-title uni-common-pl" name="subject" placeholder="日程、会议、活动主题" />
 			</view>
 			
 			<view class="uni-list-cell">
@@ -145,10 +145,10 @@
 					});
 					return;
 				}
-				uni.showModal({
+				/* uni.showModal({
 					content: '表单数据内容：' + JSON.stringify(formdata),
 					showCancel: false
-				});
+				}); */
 				uni.request({
 					url: this.url_pre+'/application/save', //接口地址。
 					data: e.detail.value,
@@ -162,7 +162,14 @@
 						this.massage=res.data.msg;
 						uni.showModal({
 							content: this.massage,
-							showCancel: false
+							showCancel: false,
+							success: () => {
+								if(res.data.msg=="success"){
+									uni.navigateTo({
+										url: "/meetList"
+									});
+								}
+							}
 						});
 					},
 					fail: (res) => {

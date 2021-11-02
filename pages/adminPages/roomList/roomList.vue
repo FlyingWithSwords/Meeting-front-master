@@ -535,9 +535,24 @@
 					    success: (res) => {
 					        console.log(res.data);
 					        console.log('request success');
+							uni.showToast({
+								title: res.data.msg,
+								icon: '',
+								duration: 3000
+							});
+							if(res.data.msg=="success"){
+								uni.navigateTo({
+									url: "/roomList"
+								});
+							}
 					    },
 						fail: (res) => {
 							console.log(res.data);
+							uni.showToast({
+								title: res.data.msg,
+								icon: 'none',
+								duration: 3000
+							});
 							console.log('request failure');
 						}
 					});
@@ -548,7 +563,7 @@
 					})
 				}
 				var ids = new Array();
-				ids.push(this.roomList[this.pickerUserIndex].id);
+				ids.push(parseInt(this.roomList[this.pickerUserIndex].id));
 				if(index==2){
 					uni.request({
 					    url: this.url_pre+'/room/delete', //接口地址。
@@ -560,20 +575,35 @@
 					    success: (res) => {
 					        console.log(res.data);
 					        console.log('request success');
+							uni.showToast({
+								title: res.data.msg,
+								icon: 'none',
+								duration: 3000
+							});
+							if(res.data.msg=="success"){
+								uni.navigateTo({
+									url: "/roomList"
+								});
+							}
 					    },
 						fail: (res) => {
 							console.log(res.data);
+							uni.showToast({
+								title: res.data.msg,
+								icon: 'none',
+								duration: 3000
+							});
 							console.log('request failure');
 						}
 					});
 				}
 			
-				uni.showToast({
+				/* uni.showToast({
 					title: `第${this.pickerUserIndex+1}个会议室,第${index+1}个按钮`,
 					icon: "none",
 					mask: true,
 					duration: 600
-				});
+				}); */
 			
 				/* 
 				 因为隐藏弹窗方法中会将当前选择的用户下标还原为-1,

@@ -1,10 +1,10 @@
 <template>
-	<view class="content">
+	<view class="content" :key="isRouterAlive">
 		<u-row align="top">
 			<u-col span="5.3">
 				<view class="memberlist" :style="contentStyleObj">
 					<uni-list v-for="(item,i) in eslId">
-						<view @click="memberCheck(item)"><uni-list-item class="member" :title="item"></uni-list-item></view>
+						<view @click="memberCheck(item,i)"><uni-list-item :class="member[i]" :title="item"></uni-list-item></view>
 					</uni-list>
 				</view>
 			</u-col>
@@ -64,24 +64,28 @@
 				postJson: {},
 				contentStyleObj:{
 					height:''
-		　　　　 }
-		
+		　　　　 },
+				member: [],
+				isRouterAlive: true
 			}
 		},
 		onLoad(option) {
 			this.applicationId=option.applicationId;
 			this.roomId=option.roomId;
 			uni.request({
-					url: this.url_pre+'/esl/list', //接口地址
+					url: this.url_pre+'/room/info/'+this.roomId, //接口地址
 					// data: {user: "aaa"},
 					method: 'GET',
 					header: {
 						'content-type': 'application/json' //自定义请求头信息
 					},
 					success: (res) => {
-						var datalist = res.data.page.list;
+						var datalist = res.data.room.eslIds;
 						for(var i=0;i<datalist.length;i++){
-							this.eslId.push(datalist[i].eslId);
+							if(datalist[i].type=="namePlate"){
+								this.eslId.push(datalist[i].eslId);
+								this.member.push("member");
+							}
 						}
 						console.log(res.data);
 						console.log('request success');
@@ -101,9 +105,32 @@
 				this.postJson.roomId=this.roomId;
 				this.postJson.eslId=this.eslId_sel;
 				console.log(this.postJson);
-				if(JSON.stringify(formdata).indexOf("\"\"")!=-1){
+				var form_title = "";
+				var form_flag = 0;
+				var first_Ftitle = "";
+				for(var ele in formdata){
+					if(formdata[ele].length==0){
+						if(form_flag==1 && form_title.length!=0){
+							first_Ftitle = form_title;
+						}
+						switch(ele) {
+							case 'company': form_title="填写公司";break;
+							case 'title': form_title="填写职称";break;
+							case 'name': form_title="填写姓名";break;
+							default:continue;
+						}
+						if(form_flag>=1 && first_Ftitle.length!=0){
+							form_title=first_Ftitle;
+						}
+						form_flag++;
+					}
+				}
+				if(form_flag==3){
+					form_title="补充所有内容";
+				}
+				if(form_title!=""){
 					uni.showModal({
-						content: "不能提交空信息",
+						content: "请"+form_title,
 						showCancel: false
 					});
 					return;
@@ -139,8 +166,16 @@
 					}
 				});
 			},
-			memberCheck(eslId){
+			memberCheck(eslId,index){
 				this.eslId_sel=eslId;
+				for(var i=0;i<this.member.length;i++){
+					if(i==index){
+						this.member[i]="memberHover";
+					}
+					else{
+						this.member[i]="member";
+					}
+				}
 				console.log(this.eslId_sel);
 				uni.request({
 						url: this.url_pre+'/participant/list', //接口地址。
@@ -157,6 +192,11 @@
 							console.log('request failure');
 						}
 				});
+				this.isRouterAlive = false;
+				this.$nextTick(() => {
+					this.isRouterAlive = true;
+				});
+				console.log(this.isRouterAlive);
 			},
 			getHeight(){
 			      this.contentStyleObj.height=window.innerHeight-44+'px';
@@ -187,17 +227,23 @@
 		padding: 0!important;
 	}
 	
-	.memberlist{
+	.content .memberlist{
 		float: left;
 		box-shadow: #999 1rpx 1rpx 30rpx 1rpx;
 		background: #fff;
 		width: 99.8%;
 	}
 	
-	.member{
+	.content .memberlist .member{
 		background: #f5f5f5;
+		transition: all .3s linear;
 	}
-	.member:hover{
+	.content .memberlist .member:hover{
+		background: #fff;
+		border-left: 6rpx solid #007AFF;
+		transition: all .3s linear;
+	}
+	.content .memberlist .memberHover{
 		background: #fff;
 		border-left: 6rpx solid #007AFF;
 	}
