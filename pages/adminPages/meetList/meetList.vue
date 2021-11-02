@@ -1,5 +1,5 @@
 <template>
-	<view class="content" :key="isRouterAlive">
+	<view class="content" :key="isRouterAlive" >
 		<view class="uni-input title">全部会议</view>
 		<view style="margin: 8px;">
 			<picker @change="bindPickerChange" :value="index" :range="array" class="picker-s">

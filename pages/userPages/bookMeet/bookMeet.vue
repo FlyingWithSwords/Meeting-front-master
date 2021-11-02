@@ -145,10 +145,6 @@
 					});
 					return;
 				}
-				/* uni.showModal({
-					content: '表单数据内容：' + JSON.stringify(formdata),
-					showCancel: false
-				}); */
 				uni.request({
 					url: this.url_pre+'/application/save', //接口地址。
 					data: e.detail.value,
