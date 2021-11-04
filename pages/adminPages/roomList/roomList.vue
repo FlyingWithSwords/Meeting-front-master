@@ -8,14 +8,23 @@
 					<view hidden="true"><input type="hidden" name="province" :value="indexLs_c[0]==-1?"":code_res[value_c[0]].code" /></view>
 					<view hidden="true"><input type="hidden" name="city" :value="indexLs_c[1]==-1?"":code_res[value_c[0]].cities[value_c[1]].code" /></view>
 				</picker>
-				<picker @change="bindPickerFloor" :value="index_f" :range="array_f" style="margin-left:5px;float: left;border: #ccc solid 1px;background: #fff; border-radius: 1em;height: 30px;width: 120px;">
+				<!-- <picker @change="bindPickerFloor" :value="index_f" :range="array_f" style="margin-left:5px;float: left;border: #ccc solid 1px;background: #fff; border-radius: 1em;height: 30px;width: 120px;">
 					<view v-if="index_f==-1" class="uni-input" style="color: #888;background: #0000;line-height: 15px;">请选择></view>
 					<view v-else class="uni-input" style="background: #0000;line-height: 15px;">{{array_f[index_f]}}</view>
 					<view hidden="true"><input type="hidden" name="floor" :value="value_f[index_f]" /></view>
-				</picker>
+				</picker> -->
 				<picker mode="date" :value="date" @change="bindDateChange" style="margin-left:5px;float: left;padding:0 12px; border: #ccc solid 1px;background: #fff;border-radius: 1em;">
 					<view class="time-text">{{date}}</view>
 				</picker>
+				<view style="margin-left:5px;float: left;padding:0 12px; border: #ccc solid 1px;background: #fff;border-radius: 1em;">
+					<picker mode="time" :value="time1" @change="bindTimeChange1" style="float:left;">
+						<view class="time-text">{{time1}}</view>
+					</picker>
+					<view style="float:left;">~</view>
+					<picker mode="time" :value="time2" @change="bindTimeChange2" style="float:left;">
+						<view class="time-text">{{time2}}</view>
+					</picker>
+				</view>
 				<!-- <u-checkbox name="AllDay" v-model="checked" @change="getCheck()" style="line-height: 30px; margin-left: 12px;" size="22px">全天</u-checkbox> -->
 			</view>
 		</form>
@@ -48,7 +57,7 @@
 			const currentDate = this.getDate({
 				format: true
 			},"");
-			const currentTime = this.getTime();
+			const currentTime = this.getTime(0);
 			return {
 				url_pre: urlConfig.baseUrl,
 				tarbarList: [{
@@ -89,6 +98,8 @@
 				index_c: -1,
 				index_f: 0,
 				date: currentDate,
+				time1: currentTime,
+				time2: this.getTime(1),
 				currentTarbar: 0,
 				currentTab: 0,
 				scrollTop: 0,
@@ -319,7 +330,7 @@
 				});
 			    return this
 			},
-			bindPickerFloor: function(e) {
+			/* bindPickerFloor: function(e) {
 				this.index_f = e.target.value;
 				this.selectJson.floor = this.value_f[this.index_f];
 				if(this.index_f==0){delete this.selectJson.floor;}
@@ -352,7 +363,7 @@
 				    }
 				});
 				console.log('picker发送选择改变，携带值为', e.target.value)
-			},
+			}, */
 			getCheck() {
 				console.log(this.checked);
 			},
@@ -366,7 +377,7 @@
 			// },
 			bindDateChange: function(e) {
 				this.date = this.getDate("",e.target.value);
-				this.selectJson.bookDate = this.date+" 00:00:00";
+				this.selectJson.bookDate = this.date;
 				uni.request({
 					url: this.url_pre+'room/list',
 					data: this.selectJson,   // 这里传入你的参数(json格式)
@@ -405,15 +416,94 @@
 				});
 				console.log(this.date);
 			},
-			bindTimeChange: function(e) {
-				this.time = e.target.value;
+			bindTimeChange1: function(e) {
+				this.time1 = e.target.value;
+				this.selectJson.startTime = this.time1+":00";
+				uni.request({
+					url: this.url_pre+'room/list',
+					data: this.selectJson,   // 这里传入你的参数(json格式)
+					method: 'GET',
+					header: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					},
+					dataType: 'json',
+					success: (response) => {
+						console.log(this.selectJson);
+						var objstr = '[';
+						var datalist = response.data.page.list;
+						for(var i=0;i<datalist.length;i++){
+							objstr+="{\"id\""+": '"+datalist[i].roomEntity.id+"',\"roomName\":\""+datalist[i].roomEntity.name+"\"}";
+							if(i!=datalist.length-1){
+								objstr+=", ";
+							}
+						}
+						objstr+="]";
+						this.roomList=eval("("+objstr+")");
+						console.log('请求登录后返回的数据：', response);
+					},
+					fail: (err) => {
+						console.log('登录失败：', err);
+					},
+					complete: (com) => {
+						if(com.data.msg!="success"){
+							uni.showToast({
+								title: com.data.msg,
+								icon: 'none',
+								duration: 3000
+							});
+						}
+						console.log('请求登录结束：', com);
+					}
+				});
+				console.log(this.time1);
 			},
-			getTime(){
-				const date = new Date();
-				let hour = date.getHours();
-				let min = (date.getMinutes()<10?"0":"")+date.getMinutes();
-				return hour+':'+min;
+			bindTimeChange2: function(e) {
+				this.time2 = e.target.value;
+				this.selectJson.endTime = this.time2+":00";
+				uni.request({
+					url: this.url_pre+'room/list',
+					data: this.selectJson,   // 这里传入你的参数(json格式)
+					method: 'GET',
+					header: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					},
+					dataType: 'json',
+					success: (response) => {
+						console.log(this.selectJson);
+						var objstr = '[';
+						var datalist = response.data.page.list;
+						for(var i=0;i<datalist.length;i++){
+							objstr+="{\"id\""+": '"+datalist[i].roomEntity.id+"',\"roomName\":\""+datalist[i].roomEntity.name+"\"}";
+							if(i!=datalist.length-1){
+								objstr+=", ";
+							}
+						}
+						objstr+="]";
+						this.roomList=eval("("+objstr+")");
+						console.log('请求登录后返回的数据：', response);
+					},
+					fail: (err) => {
+						console.log('登录失败：', err);
+					},
+					complete: (com) => {
+						if(com.data.msg!="success"){
+							uni.showToast({
+								title: com.data.msg,
+								icon: 'none',
+								duration: 3000
+							});
+						}
+						console.log('请求登录结束：', com);
+					}
+				});
+				console.log(this.time2);
 			},
+			getTime(after) {
+				const date = after == 0 ? new Date() : new Date(new Date().getTime() + after * 60 * 60 * 1000);
+				let hour = (date.getHours() < 10 ? "0" : "") + date.getHours();
+				let min = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes();
+				return hour + ':' + min;
+			}, 
 			getDate(type,value) {
 				const date = (value=="")?new Date():new Date(value);
 				let year = date.getFullYear();

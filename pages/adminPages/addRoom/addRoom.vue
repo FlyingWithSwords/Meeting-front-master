@@ -462,7 +462,7 @@
 			},
 			getTime(after) {
 				const date = after == 0 ? new Date() : new Date(new Date().getTime() + after * 60 * 60 * 1000);
-				let hour = date.getHours();
+				let hour = (date.getHours() < 10 ? "0" : "") + date.getHours();
 				let min = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes();
 				return hour + ':' + min;
 			}, 

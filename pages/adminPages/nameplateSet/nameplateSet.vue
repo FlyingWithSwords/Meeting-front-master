@@ -16,14 +16,14 @@
 							<view class="uni-form-item">
 								<view class="uni-title uni-common-pl">公司<font style="color: #ff0000;margin-left: 3px;">*</font>
 								</view>
-								<input class="uni-input text-edited" name="company" placeholder="请输入"/>
+								<input class="uni-input text-edited" name="company" placeholder="请输入" :value="company_in"/>
 							</view>
 						</view>
 						<view class="uni-list-cell">
 							<view class="uni-form-item">
 								<view class="uni-title uni-common-pl">职称<font style="color: #ff0000;margin-left: 3px;">*</font>
 								</view>
-								<input class="uni-input text-edited" name="title" placeholder="请输入"/>
+								<input class="uni-input text-edited" name="title" placeholder="请输入" :value="title_in"/>
 							</view>
 						</view>
 					
@@ -32,7 +32,7 @@
 								<view class="uni-title uni-common-pl">姓名<font style="color: #ff0000;margin-left: 3px;">*</font>
 								</view>
 								<view class="uni-list-cell-db text-edited">
-									<input class="uni-input text-edited" name="name" placeholder="请输入"/>
+									<input class="uni-input text-edited" name="name" placeholder="请输入" :value="name_in"/>
 								</view>
 							</view>
 						</view>
@@ -66,7 +66,10 @@
 					height:''
 		　　　　 },
 				member: [],
-				isRouterAlive: true
+				isRouterAlive: true,
+				company_in: "",
+				title_in: "",
+				name_in: ""
 			}
 		},
 		onLoad(option) {
@@ -168,6 +171,9 @@
 			},
 			memberCheck(eslId,index){
 				this.eslId_sel=eslId;
+				this.company_in="";
+				this.title_in="";
+				this.name_in="";
 				for(var i=0;i<this.member.length;i++){
 					if(i==index){
 						this.member[i]="memberHover";
@@ -177,6 +183,32 @@
 					}
 				}
 				console.log(this.eslId_sel);
+				uni.request({
+						url: this.url_pre+'/esl/getContent', //接口地址。
+						data: {eslId: eslId, applicationId: this.applicationId},
+						method: 'GET',
+						header: {
+							'custom-header': 'application/json' //自定义请求头信息
+						},
+						success: (res) => {
+							console.log(res.data);
+							var datalist = res.data.page.list;
+							for(var i=0;i<datalist.length;i++){
+								if(datalist[i].roomId==this.roomId){
+									this.company_in=datalist[i].company;
+									this.title_in=datalist[i].title;
+									this.name_in=datalist[i].name;
+									break;
+								}
+							}
+							console.log('request success');
+						},
+						fail: (res) => {
+							console.log(res.data);
+							console.log('request failure');
+						}
+				});
+				
 				uni.request({
 						url: this.url_pre+'/participant/list', //接口地址。
 						data: {applicationId: this.applicationId},
@@ -192,6 +224,7 @@
 							console.log('request failure');
 						}
 				});
+				
 				this.isRouterAlive = false;
 				this.$nextTick(() => {
 					this.isRouterAlive = true;
