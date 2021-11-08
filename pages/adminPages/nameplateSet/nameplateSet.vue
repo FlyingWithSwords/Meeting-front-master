@@ -117,6 +117,7 @@
 							first_Ftitle = form_title;
 						}
 						switch(ele) {
+							case 'eslId': form_title="选择电子铭牌";break;
 							case 'company': form_title="填写公司";break;
 							case 'title': form_title="填写职称";break;
 							case 'name': form_title="填写姓名";break;
@@ -128,7 +129,7 @@
 						form_flag++;
 					}
 				}
-				if(form_flag==3){
+				if(form_flag==4){
 					form_title="补充所有内容";
 				}
 				if(form_title!=""){

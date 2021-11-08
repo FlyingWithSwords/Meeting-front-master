@@ -1,38 +1,46 @@
 <template>
 	<view class="content">
 		<form ref="form" @reset="formReset" style="z-index: 966;">
-			<view class="uni-list-cell-db" style="background: #fff;height: 40px;margin: 0;border-bottom: 1rpx solid #eee;">
-				<picker @change="bindPickerCity" @columnchange="columnchange" :range="array_c" range-key="name" :value="value_c" mode="multiSelector" style="margin-left:5px;float: left;border: #ccc solid 1px;background: #fff;border-radius: 1em;height: 30px;width: 120px;">
-					<view v-if="indexLs_c[0]==-1 || indexLs_c[1]==-1" class="uni-input" style="color: #888;background: #0000;line-height: 15px;">请选择></view>
-					<view v-else class="uni-input" style="background: #0000;line-height: 15px;">{{array_c[0][value_c[0]].name+" "+array_c[1][value_c[1]].name}}</view>
-					<view hidden="true"><input type="hidden" name="province" :value="indexLs_c[0]==-1?"":code_res[value_c[0]].code" /></view>
-					<view hidden="true"><input type="hidden" name="city" :value="indexLs_c[1]==-1?"":code_res[value_c[0]].cities[value_c[1]].code" /></view>
-				</picker>
+			<view>
+				<u-row align="top" class="uni-list-cell-db" style="background: #fff;height: 80rpx;margin: 0;border-bottom: 1rpx solid #eee;">
+					<u-col span="4">
+						<picker @change="bindPickerCity" @columnchange="columnchange" :range="array_c" range-key="name" :value="value_c" mode="multiSelector" style="margin-left:10rpx;border: #ccc solid 1px;background: #fff;border-radius: 1em;height: 60rpx;width: 220rpx;">
+							<view v-if="indexLs_c[0]==-1 || indexLs_c[1]==-1" class="uni-input" style="color: #888;background: #0000;line-height: 15px;">请选择></view>
+							<view v-else class="uni-input" style="background: #0000;line-height: 15px;">{{array_c[0][value_c[0]].name+" "+array_c[1][value_c[1]].name}}</view>
+							<view hidden="true"><input type="hidden" name="province" :value="indexLs_c[0]==-1?"":code_res[value_c[0]].code" /></view>
+							<view hidden="true"><input type="hidden" name="city" :value="indexLs_c[1]==-1?"":code_res[value_c[0]].cities[value_c[1]].code" /></view>
+						</picker>
+					</u-col>
 				<!-- <picker @change="bindPickerFloor" :value="index_f" :range="array_f" style="margin-left:5px;float: left;border: #ccc solid 1px;background: #fff; border-radius: 1em;height: 30px;width: 120px;">
 					<view v-if="index_f==-1" class="uni-input" style="color: #888;background: #0000;line-height: 15px;">请选择></view>
 					<view v-else class="uni-input" style="background: #0000;line-height: 15px;">{{array_f[index_f]}}</view>
 					<view hidden="true"><input type="hidden" name="floor" :value="value_f[index_f]" /></view>
 				</picker> -->
-				<picker mode="date" :value="date" @change="bindDateChange" style="margin-left:5px;float: left;padding:0 12px; border: #ccc solid 1px;background: #fff;border-radius: 1em;">
-					<view class="time-text">{{date}}</view>
-				</picker>
-				<view style="margin-left:5px;float: left;padding:0 12px; border: #ccc solid 1px;background: #fff;border-radius: 1em;">
-					<picker mode="time" :value="time1" @change="bindTimeChange1" style="float:left;">
-						<view class="time-text">{{time1}}</view>
+				<u-col span="4">
+					<picker mode="date" :value="date" @change="bindDateChange" style="margin-left:10rpx;padding:0 20rpx; border: #ccc solid 1px;background: #fff;border-radius: 1em;width: 176rpx;">
+						<view class="time-text">{{date}}</view>
 					</picker>
-					<view style="float:left;">~</view>
-					<picker mode="time" :value="time2" @change="bindTimeChange2" style="float:left;">
-						<view class="time-text">{{time2}}</view>
-					</picker>
-				</view>
+				</u-col>
+					<u-col span="4">
+						<view style="margin-right:10rpx;float: left;padding:0 12rpx; border: #ccc solid 1px;background: #fff;border-radius: 1em;">
+							<picker mode="time" :value="time1" @change="bindTimeChange1" style="float:left;">
+								<view class="time-text">{{time1}}</view>
+							</picker>
+							<view style="float:left;">~</view>
+							<picker mode="time" :value="time2" @change="bindTimeChange2" style="float:left;">
+								<view class="time-text">{{time2}}</view>
+							</picker>
+						</view>
+					</u-col>
+				</u-row>
 				<!-- <u-checkbox name="AllDay" v-model="checked" @change="getCheck()" style="line-height: 30px; margin-left: 12px;" size="22px">全天</u-checkbox> -->
 			</view>
 		</form>
 		<view>
 			<!-- <u-tabs :list="tabList" :is-scroll="false" :current="currentTab" @change="changeTab"></u-tabs> -->
 			<u-index-list :scrollTop="scrollTop" style="clear: both;" :sticky="false" :index-list="[]">
-				<view v-for="(item, index) in roomList" :key="index" :data-index="index"  @mousemove="getClient" @longpress="onLongPress" @contextmenu.prevent="oncontextmenu" :class="{'active':pickerUserIndex==index}" @tap="listTap(item.id)">
-					<view class="list-cell roomList">{{item.roomName}}</view>
+				<view v-for="(item, index) in roomList" :key="index" :data-index="index" @mousemove="getClient" @longpress="onLongPress" @contextmenu.prevent="oncontextmenu" :class="{'active':pickerUserIndex==index}" @tap="listTap(item.id)">
+					<view class="list-cell roomList">{{item.roomName}}<span style="position:absolute;right: 30rpx;"><image :src="item.state=='usable'?'/static/img/on.png':'/static/img/off.png'" style="width: 36rpx;height: 36rpx;"></image></span></view>
 				</view>
 			</u-index-list>
 		</view>
@@ -145,7 +153,7 @@
 						var objstr = '[';
 						var datalist = res.data.page.list;
 						for(var i=0;i<datalist.length;i++){
-							objstr+="{\"id\""+": '"+datalist[i].roomEntity.id+"',\"roomName\":\""+datalist[i].roomEntity.name+"\"}";
+							objstr+="{\"id\""+": '"+datalist[i].roomEntity.id+"',\"roomName\":\""+datalist[i].roomEntity.name+"\",\"state\":\""+datalist[i].roomEntity.state+"\"}";
 							if(i!=datalist.length-1){
 								objstr+=", ";
 							}
@@ -312,7 +320,7 @@
 						var objstr = '[';
 						var datalist = response.data.page.list;
 						for(var i=0;i<datalist.length;i++){
-							objstr+="{\"id\""+": '"+datalist[i].roomEntity.id+"',\"roomName\":\""+datalist[i].roomEntity.name+"\"}";
+							objstr+="{\"id\""+": '"+datalist[i].roomEntity.id+"',\"roomName\":\""+datalist[i].roomEntity.name+"\",\"state\":\""+datalist[i].roomEntity.state+"\"}";
 							if(i!=datalist.length-1){
 								objstr+=", ";
 							}
@@ -391,7 +399,7 @@
 						var objstr = '[';
 						var datalist = response.data.page.list;
 						for(var i=0;i<datalist.length;i++){
-							objstr+="{\"id\""+": '"+datalist[i].roomEntity.id+"',\"roomName\":\""+datalist[i].roomEntity.name+"\"}";
+							objstr+="{\"id\""+": '"+datalist[i].roomEntity.id+"',\"roomName\":\""+datalist[i].roomEntity.name+"\",\"state\":\""+datalist[i].roomEntity.state+"\"}";
 							if(i!=datalist.length-1){
 								objstr+=", ";
 							}
@@ -432,7 +440,7 @@
 						var objstr = '[';
 						var datalist = response.data.page.list;
 						for(var i=0;i<datalist.length;i++){
-							objstr+="{\"id\""+": '"+datalist[i].roomEntity.id+"',\"roomName\":\""+datalist[i].roomEntity.name+"\"}";
+							objstr+="{\"id\""+": '"+datalist[i].roomEntity.id+"',\"roomName\":\""+datalist[i].roomEntity.name+"\",\"state\":\""+datalist[i].roomEntity.state+"\"}";
 							if(i!=datalist.length-1){
 								objstr+=", ";
 							}
@@ -473,7 +481,7 @@
 						var objstr = '[';
 						var datalist = response.data.page.list;
 						for(var i=0;i<datalist.length;i++){
-							objstr+="{\"id\""+": '"+datalist[i].roomEntity.id+"',\"roomName\":\""+datalist[i].roomEntity.name+"\"}";
+							objstr+="{\"id\""+": '"+datalist[i].roomEntity.id+"',\"roomName\":\""+datalist[i].roomEntity.name+"\",\"state\":\""+datalist[i].roomEntity.state+"\"}";
 							if(i!=datalist.length-1){
 								objstr+=", ";
 							}
@@ -552,6 +560,7 @@
 				this.ls_clientX=e.clientX;
 				this.ls_clientY=e.clientY;
 			},
+			/* PC端右键菜单 */
 			oncontextmenu(e) {
 				var style="";
 				
@@ -568,6 +577,12 @@
 				
 				this.popStyle = style;
 				this.pickerUserIndex = Number(e.currentTarget.dataset.index);
+				if(this.roomList[this.pickerUserIndex].state=="usable"){
+					this.popButton[0] = "临时关闭";
+				}
+				else{
+					this.popButton[0] = "开启";
+				}
 				this.showShade = true;
 				this.$nextTick(() => {
 					setTimeout(() => {
@@ -593,6 +608,12 @@
 			
 				this.popStyle = style;
 				this.pickerUserIndex = Number(index);
+				if(this.roomList[this.pickerUserIndex].state=="usable"){
+					this.popButton[0] = "临时关闭";
+				}
+				else{
+					this.popButton[0] = "开启";
+				}
 				this.showShade = true;
 				this.$nextTick(() => {
 					setTimeout(() => {
@@ -615,9 +636,16 @@
 				// 在这里开启你的代码秀
 				
 				if(index==0){
+					var state = "";
+					if(this.roomList[this.pickerUserIndex].state=="usable"){
+						state = "unusable";
+					}
+					else{
+						state = "usable";
+					}
 					uni.request({
 					    url: this.url_pre+'/room/update', //接口地址。
-					    data: {id: this.roomList[this.pickerUserIndex].id, state: "unusable"},
+					    data: {id: this.roomList[this.pickerUserIndex].id, state: state},
 					    method: 'POST',
 					    header: {
 					    	'content-type': 'application/json' //自定义请求头信息
@@ -653,11 +681,11 @@
 					})
 				}
 				var ids = new Array();
-				ids.push(parseInt(this.roomList[this.pickerUserIndex].id));
+				ids.push(this.roomList[this.pickerUserIndex].id);
 				if(index==2){
 					uni.request({
 					    url: this.url_pre+'/room/delete', //接口地址。
-					    data: {ids: ids},
+					    data: ids,
 					    method: 'POST',
 					    header: {
 					    	'content-type': 'application/json' //自定义请求头信息

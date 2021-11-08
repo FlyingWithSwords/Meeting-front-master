@@ -101,6 +101,11 @@
 						},
 						success: (res) => {
 							console.log(res.data);
+							uni.showToast({
+								title: res.data.msg,
+								icon: 'none',
+								duration: 3000
+							});
 							console.log('request success');
 						},
 						fail: (res) => {
